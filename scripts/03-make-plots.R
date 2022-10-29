@@ -23,7 +23,6 @@ pressure <- d[["CTDPRS..dbar."]]
 chlfluor <- d[["Fluorescence.Chl.a..mg.m..3."]]
 ctdoxy <- d[["CTDOXY..umol.kg."]]
 beamatt <- d[["Transmissometer.Beam.Attenuation..1.m."]]
-str(beamatt)
 #make CTD object
 ctd <- as.ctd(salinity, temperature, pressure)
 #add additional data to CTD object
