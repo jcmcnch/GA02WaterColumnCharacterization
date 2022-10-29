@@ -2,12 +2,16 @@
 args = commandArgs(trailingOnly=TRUE)
 library(oce)
 d <- read.csv(args[1], sep='\t')
-#remove null values
+#remove null and blank values
 d[d==-999] <- NA
+d[d==""] <- NA
+d[is.na(d)] <- 0
 
 d_bottle <- read.csv(args[2], sep='\t')
-#remove null values
+#remove null and blank values
 d_bottle[d_bottle==-999] <- NA
+d_bottle[d_bottle==""] <- NA
+d_bottle[is.na(d_bottle)] <- 0
 
 #order by depth
 d_bottle <- d_bottle[order(d_bottle[["PRESSURE..dbar."]], decreasing = TRUE),]
@@ -19,6 +23,7 @@ pressure <- d[["CTDPRS..dbar."]]
 chlfluor <- d[["Fluorescence.Chl.a..mg.m..3."]]
 ctdoxy <- d[["CTDOXY..umol.kg."]]
 beamatt <- d[["Transmissometer.Beam.Attenuation..1.m."]]
+str(beamatt)
 #make CTD object
 ctd <- as.ctd(salinity, temperature, pressure)
 #add additional data to CTD object
@@ -36,7 +41,7 @@ bottle.data <- oceSetData(bottle.data, 'Dissolved Nitrate (µm/kg)', value=disso
 #make plot
 pdf(args[3], width=9,height=7)
 #multiple columns
-par(mfrow=c(1,5), mar=c(0,0,0,0))
+par(mfrow=c(1,5), mar=c(1,1,1,1), oma=c(10,1,1,1))
 #plot templerature profile
 plotProfile(ctd, xtype="temperature", ylim=c(300, 0), xlim=c(0,25))
 temperature <- ctd[["temperature"]]
@@ -49,8 +54,14 @@ for (criterion in c(0.1, 0.5)) {
     abline(h=pressure[MLDindex], lwd=2, lty="dashed")
 }
 #plot other data sources
-plotProfile(ctd, xtype="Chlorophyll (mg/m^3)", ylim=c(300, 0), col="darkgreen")
-plotProfile(ctd, xtype="CTD Oxygen (µM)", ylim=c(300, 0), col="darkblue")
-plotProfile(ctd, xtype="Beam Attenuation (1/m)", ylim=c(300, 0), col="red")
-plotProfile(bottle.data, xtype="Dissolved Nitrate (µm/kg)", ylim=c(300, 0), col="orange", type="b")
+plotProfile(ctd, xtype="Chlorophyll (mg/m^3)", ylim=c(300, 0), col="darkgreen", keepNA=TRUE)
+plotProfile(ctd, xtype="CTD Oxygen (µM)", ylim=c(300, 0), col="darkblue", keepNA=TRUE)
+plotProfile(ctd, xtype="Beam Attenuation (1/m)", ylim=c(300, 0), col="red", keepNA=TRUE)
+plotProfile(bottle.data, xtype="Dissolved Nitrate (µm/kg)", ylim=c(300, 0), col="orange", type="b", keepNA=TRUE)
+
+#source = https://stackoverflow.com/questions/7367138/text-wrap-for-plot-titles
+wrap_strings <- function(vector_of_strings,width){sapply(vector_of_strings,FUN=function(x){paste(strwrap(x,width=width), collapse="\n")})}
+
+mtext(wrap_strings(args[4], 30), outer=TRUE, adj=0.5, padj=1, side=1)
+
 dev.off()
