@@ -36,11 +36,13 @@ pressure.bottle <- d_bottle[["PRESSURE..dbar."]]
 bottle.data <- as.ctd(salinity.bottle, temperature.bottle, pressure.bottle)
 dissolvedNO3=d_bottle[["NITRATE_D_CONC_BOTTLE..umol.kg."]]
 bottle.data <- oceSetData(bottle.data, 'Dissolved Nitrate (µm/kg)', value=dissolvedNO3)
+plasFrac=d_bottle[["plasFrac"]]
+bottle.data <- oceSetData(bottle.data, 'Fraction Plastid SSU rRNA', value=plasFrac)
 
 #make plot
 pdf(args[3], width=9,height=7)
 #multiple columns
-par(mfrow=c(1,5), mar=c(1,1,1,1), oma=c(10,1,1,1))
+par(mfrow=c(1,6), mar=c(1,1,1,1), oma=c(10,1,1,1))
 #plot templerature profile
 plotProfile(ctd, xtype="temperature", ylim=c(300, 0), xlim=c(0,25))
 temperature <- ctd[["temperature"]]
@@ -57,6 +59,7 @@ plotProfile(ctd, xtype="Chlorophyll (mg/m^3)", ylim=c(300, 0), col="darkgreen", 
 plotProfile(ctd, xtype="CTD Oxygen (µM)", ylim=c(300, 0), col="darkblue", keepNA=TRUE)
 plotProfile(ctd, xtype="Beam Attenuation (1/m)", ylim=c(300, 0), col="red", keepNA=TRUE)
 plotProfile(bottle.data, xtype="Dissolved Nitrate (µm/kg)", ylim=c(300, 0), col="orange", type="b", keepNA=TRUE)
+plotProfile(bottle.data, xtype="Fraction Plastid SSU rRNA", ylim=c(300, 0), col="darkgreen", type="b", keepNA=TRUE)
 
 #source = https://stackoverflow.com/questions/7367138/text-wrap-for-plot-titles
 wrap_strings <- function(vector_of_strings,width){sapply(vector_of_strings,FUN=function(x){paste(strwrap(x,width=width), collapse="\n")})}
